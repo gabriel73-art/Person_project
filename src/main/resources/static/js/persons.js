@@ -40,14 +40,18 @@ async function getPersonById(id){
 
   });
   const person = await request.json();
+  personHtml="";
+  if(persons.length==0){
+      personHtml='<tr><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td><td>-</td</tr>';
 
+      }else{
   let photo=person.personalPhoto == null ? '-' : person.personalPhoto;
   let botonUpdate='<a href="update.html" class="btn btn-primary btn-icon-split btn-sm"><span class="icon text-white-50"><i class="fas fa-flag"></i></span><span class="text">Update</span></a>';
   let botonDelete='<a href="#" onclick="deletePerson('+person.id+')" class="btn btn-danger btn-icon-split btn-sm"><span class="icon text-white-50"><i class="fas fa-flag"></i></span><span class="text">Eliminar</span></a>'
 
   //let botonDelete='<a href="#" onclick="deletePerson('+person.id+')" class="btn btn-danger btn-circle btn-sm"><i class="fas fa-trash"></i></a>';
   let personHtml='<tr><td>'+person.id+'</td><td>'+person.firstName+'</td><td>'+person.secondName+'</td><td>'+person.addresses+'</td><td>'+person.dateOfBirth+'</td><td>'+person.phoneNumbers+'</td><td>'+photo+'</td><td>'+botonDelete+botonUpdate+'</td</tr>';
-
+}
   //console.log(persons);
 document.querySelector('#persons tbody').outerHTML=personHtml;
 }
