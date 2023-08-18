@@ -1,4 +1,4 @@
-# **person_project**
+# **Person project**
 ##  CRUD using Spring Boot, H2 Database in-memory, Javascript, HTML and CSS
 ###   Points to consider:
 
