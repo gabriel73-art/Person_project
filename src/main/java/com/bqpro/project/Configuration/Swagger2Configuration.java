@@ -16,7 +16,7 @@ import java.util.Collections;
 
 @EnableSwagger2
 @Configuration
-@OpenAPIDefinition(info = @Info(
+/*@OpenAPIDefinition(info = @Info(
         title = "My REST API",
         description = "Some custom description of API.",
         version = "1.0",
@@ -29,25 +29,29 @@ import java.util.Collections;
                 name = "License of API",
                 url = "API license URL"
         )
-))
+))*/
 public class Swagger2Configuration {
 
     @Bean
     public Docket productApi() {
-        return new Docket(DocumentationType.SWAGGER_2)
+        return new Docket(DocumentationType.OAS_30)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.bqpro.project.Controller"))
                 .paths(PathSelectors.ant("/persons/*"))
-                .build();
+                .build()
+                .apiInfo(apiInfo());
     }
 
-   /* private ApiInfo apiInfo() {
+    private ApiInfo apiInfo() {
         return new ApiInfo(
-                "My REST API",
-                "Some custom description of API.",
-                "API TOS",
+                "ABC Bank API",
+                "Api to manage clients",
+                "1.0",
                 "Terms of service",
-                new Contact("Gabriel Monteagudo", "www.example.com", "gabriel.monteagudo@bestvision.group"),
-                "License of API", "API license URL", Collections.emptyList());
-    }*/
+                new Contact("Gabriel Monteagudo", "https://github.com/gabriel73-art", "gabriel.monteagudo@bestvision.group"),
+                "",
+                "",
+                Collections.emptyList());
+    }
+
 }
