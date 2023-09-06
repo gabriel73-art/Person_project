@@ -1,4 +1,4 @@
-package com.bqpro.project.Controller;
+package com.bqpro.project.RouteController;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
