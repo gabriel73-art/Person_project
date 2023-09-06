@@ -17,7 +17,7 @@ public class ProjectApplication {
 		SpringApplication.run(ProjectApplication.class, args);
 	}
 
-	@Bean
+	/*@Bean
 	CommandLineRunner commandLineRunner(PersonRepository personRepository) {
 		return args -> {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -26,6 +26,6 @@ public class ProjectApplication {
 			personRepository.save(new Person("Jane", "Smith", "456 Elm St", new Date(dateFormat.parse("1985-06-15").getTime()), "555-5678", null));
 			personRepository.save(new Person("Michael", "Johnson", "789 Oak St", new Date(dateFormat.parse("1992-12-31").getTime()), "555-9876", null));
 		};
-	}
+	}*/
 
 }
