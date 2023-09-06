@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS Person (
     personal_photo BLOB
 );
 
+
 CREATE TABLE IF NOT EXISTS Users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(50),
@@ -21,3 +22,9 @@ CREATE TABLE IF NOT EXISTS Roles(
     role VARCHAR(50)
 );
 
+
+CREATE TABLE IF NOT EXISTS Address (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    addresses VARCHAR(255),
+    person_id INT
+);
