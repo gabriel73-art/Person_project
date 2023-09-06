@@ -1,7 +1,5 @@
 package com.bqpro.project.Configuration;
 
-import io.swagger.v3.oas.annotations.OpenAPIDefinition;
-import io.swagger.v3.oas.annotations.info.Info;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.PathSelectors;
@@ -16,20 +14,6 @@ import java.util.Collections;
 
 @EnableSwagger2
 @Configuration
-/*@OpenAPIDefinition(info = @Info(
-        title = "My REST API",
-        description = "Some custom description of API.",
-        version = "1.0",
-        contact = @io.swagger.v3.oas.annotations.info.Contact(
-                name = "Gabriel Monteagudo",
-                url = "www.example.com",
-                email = "gabriel.monteagudo@bestvision.group"
-        ),
-        license = @io.swagger.v3.oas.annotations.info.License(
-                name = "License of API",
-                url = "API license URL"
-        )
-))*/
 public class Swagger2Configuration {
 
     @Bean
@@ -37,7 +21,7 @@ public class Swagger2Configuration {
         return new Docket(DocumentationType.OAS_30)
                 .select()
                 .apis(RequestHandlerSelectors.basePackage("com.bqpro.project.Controller"))
-                .paths(PathSelectors.ant("/persons/*"))
+                .paths(PathSelectors.any())
                 .build()
                 .apiInfo(apiInfo());
     }
@@ -53,5 +37,7 @@ public class Swagger2Configuration {
                 "",
                 Collections.emptyList());
     }
+
+
 
 }
