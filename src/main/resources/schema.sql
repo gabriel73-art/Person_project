@@ -7,3 +7,17 @@ CREATE TABLE IF NOT EXISTS Person (
     phone_numbers VARCHAR(255),
     personal_photo BLOB
 );
+
+CREATE TABLE IF NOT EXISTS Users (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50),
+    last_name VARCHAR(50),
+    username VARCHAR(255),
+    password VARCHAR(255)
+);
+
+CREATE TABLE IF NOT EXISTS Roles(
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    role VARCHAR(50)
+);
+
