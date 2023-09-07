@@ -5,16 +5,22 @@ import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
 import com.bqpro.project.Model.Role;
 import com.bqpro.project.Repository.AddressRepository;
+import com.bqpro.project.Model.User;
 import com.bqpro.project.Repository.PersonRepository;
 import com.bqpro.project.Repository.RoleRepository;
+import com.bqpro.project.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.sql.Date;
 import java.text.SimpleDateFormat;
+import java.util.HashSet;
+import java.util.Set;
 
 @SpringBootApplication(exclude = { SecurityAutoConfiguration.class })
 public class ProjectApplication {
@@ -23,9 +29,12 @@ public class ProjectApplication {
 		SpringApplication.run(ProjectApplication.class, args);
 	}
 
+	@Autowired
+	PasswordEncoder encoder;
+
 
 	@Bean
-	CommandLineRunner commandLineRunner(PersonRepository personRepository, RoleRepository roleRepository, AddressRepository addressRepository) {
+	CommandLineRunner commandLineRunner(PersonRepository personRepository, RoleRepository roleRepository, UserRepository userRepository, AddressRepository addressRepository) {
 
 		return args -> {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -60,6 +69,17 @@ public class ProjectApplication {
 			addressRepository.save(a11);
 			addressRepository.save(a2);
 			addressRepository.save(a3);
+			User adminUser = new User("Admin", "User", "admin", encoder.encode("123"));
+			Set<Role> adminRoles = new HashSet<>();
+			adminRoles.add(roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role not found.")));
+			adminUser.setRoles(adminRoles);
+			userRepository.save(adminUser);
+
+			User userUser = new User("User", "User", "user", encoder.encode("123"));
+			Set<Role> userRoles = new HashSet<>();
+			userRoles.add(roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role not found.")));
+			userUser.setRoles(userRoles);
+			userRepository.save(userUser);
 
 		};
 
