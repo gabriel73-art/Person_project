@@ -163,7 +163,7 @@ public class PersonController {
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('USER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         Optional<Person> existingPerson = personService.getPersonById(id);
