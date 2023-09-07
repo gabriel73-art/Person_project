@@ -1,11 +1,13 @@
 package com.bqpro.project.Controller;
 
+import com.bqpro.project.Exceptions.NotMatchException;
 import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
 import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -14,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
+//@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/persons")
 public class PersonController {
     private final PersonService personService;
@@ -76,7 +80,7 @@ public class PersonController {
 
     }*/
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
             produces=MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<Person> create(@RequestParam(value = "image", required = false) MultipartFile file,
@@ -123,7 +127,7 @@ public class PersonController {
     }
 
 
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long id, @RequestBody Person person) {
         Optional<Person> existingPerson = personService.getPersonById(id);
@@ -184,7 +188,10 @@ public class PersonController {
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String secondName,
             @RequestParam(required = false) String addresses
-    ) {
+    ) throws NotMatchException {
+    try {
+
+
         Specification<Person> spec = Specification.where(null);
 
         if (firstName != null) {
@@ -199,33 +206,28 @@ public class PersonController {
 
         List<Person> personlist= personRepository.findAll(spec);
         List<Person> newlist= new ArrayList<>();
-        if (addresses != null)
-        {
+        if (addresses != null) {
             for (Person person : personlist) {
-                if(personService.findAddressByPerson(person, addresses))
+                if (personService.findAddressByPerson(person, addresses))
                     newlist.add(person);
             }
         }
-        
-
+        if(personlist==null && newlist==null)
+            throw new NotMatchException("There is no clients for that specifications");
         return addresses!= null?newlist:personlist;
     }
+        catch (NotMatchException ex){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"", ex);
 
-    /*@GetMapping("/age-range")
-    public ResponseEntity<List<Person>> getPersonsByAgeRange(@RequestParam("startAge") int startAge, @RequestParam("endAge") int endAge) {
-        LocalDate currentDate = LocalDate.now();
-        LocalDate startDate = currentDate.minusYears(endAge);
-        LocalDate endDate = currentDate.minusYears(startAge);
 
-        Date sqlStartDate = Date.valueOf(startDate);
-        Date sqlEndDate = Date.valueOf(endDate);
+    }}
 
-        List<Person> persons = personRepository.findByDateOfBirthBetween(sqlStartDate, sqlEndDate);
-        return ResponseEntity.ok(persons);
-    }*/
 
     @GetMapping("/age-range")
-    public ResponseEntity<List<Person>> getPersonsByAgeRange(@RequestParam(value = "startAge", required = false) Integer startAge, @RequestParam(value = "endAge", required = false) Integer endAge) {
+    public ResponseEntity<List<Person>> getPersonsByAgeRange(@RequestParam(value = "startAge", required = false) Integer startAge,
+                                                             @RequestParam(value = "endAge", required = false) Integer endAge) throws NotMatchException{
+        try{
+            List<Person> persons = new ArrayList<>();
         LocalDate currentDate = LocalDate.now();
         LocalDate startDate = null;
         LocalDate endDate = null;
@@ -245,11 +247,22 @@ public class PersonController {
             Date sqlStartDate = Date.valueOf(startDate);
             Date sqlEndDate = Date.valueOf(endDate);
 
-            List<Person> persons = personRepository.findByDateOfBirthBetween(sqlStartDate, sqlEndDate);
-            return ResponseEntity.ok(persons);
-        } else {
-            return ResponseEntity.badRequest().build();
+             persons = personRepository.findByDateOfBirthBetween(sqlStartDate, sqlEndDate);
+            //return ResponseEntity.ok(persons);
+            if(persons==null)
+                throw new NotMatchException("There is no clients for that age range");
+
         }
+            return ResponseEntity.ok(persons);
+        }
+        catch (NotMatchException ex){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"", ex);
+    }
+    }
+
+    @ExceptionHandler(NotMatchException.class)
+    public ResponseEntity<String> handleNotMatchException(NotMatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
 
