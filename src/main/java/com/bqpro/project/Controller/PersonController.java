@@ -11,6 +11,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -75,6 +76,7 @@ public class PersonController {
 
     }*/
 
+    @PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
             produces=MediaType.APPLICATION_JSON_VALUE)
     private ResponseEntity<Person> create(@RequestParam(value = "image", required = false) MultipartFile file,
@@ -121,6 +123,7 @@ public class PersonController {
     }
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
     public ResponseEntity<Person> updatePerson(@PathVariable Long id, @RequestBody Person person) {
         Optional<Person> existingPerson = personService.getPersonById(id);
@@ -160,6 +163,7 @@ public class PersonController {
         }
     }
 
+    //@PreAuthorize("hasRole('USER')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         Optional<Person> existingPerson = personService.getPersonById(id);
