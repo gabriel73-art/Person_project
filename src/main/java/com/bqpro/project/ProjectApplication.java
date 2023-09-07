@@ -50,6 +50,12 @@ public class ProjectApplication {
 			adminUser.setRoles(adminRoles);
 			userRepository.save(adminUser);
 
+			User userUser = new User("User", "User", "user", encoder.encode("123"));
+			Set<Role> userRoles = new HashSet<>();
+			userRoles.add(roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role not found.")));
+			userUser.setRoles(userRoles);
+			userRepository.save(userUser);
+
 		};
 
 	}
