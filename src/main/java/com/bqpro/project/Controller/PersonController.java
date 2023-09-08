@@ -223,7 +223,7 @@ public class PersonController {
     }}
 
 
-    @GetMapping("/age-range")
+   /* @GetMapping("/age-range")
     public ResponseEntity<List<Person>> getPersonsByAgeRange(@RequestParam(value = "startAge", required = false) Integer startAge,
                                                              @RequestParam(value = "endAge", required = false) Integer endAge) throws NotMatchException{
         try{
@@ -258,10 +258,59 @@ public class PersonController {
         catch (NotMatchException ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"", ex);
     }
+    }*/
+
+    @GetMapping("/age-range")
+    public ResponseEntity<List<Person>> getPersonsByAgeRange(
+            @RequestParam(value = "startAge", required = false) String startAgeStr,
+            @RequestParam(value = "endAge", required = false) String endAgeStr) {
+
+        List<Person> persons = new ArrayList<>();
+        try {
+            Integer startAge = (startAgeStr != null) ? Integer.parseInt(startAgeStr) : null;
+            Integer endAge = (endAgeStr != null) ? Integer.parseInt(endAgeStr) : null;
+
+            LocalDate currentDate = LocalDate.now();
+            LocalDate startDate = null;
+            LocalDate endDate = null;
+
+            if (startAge != null && endAge != null) {
+                startDate = currentDate.minusYears(endAge);
+                endDate = currentDate.minusYears(startAge);
+            } else if (startAge != null) {
+                startDate = currentDate.minusYears(200);
+                endDate = currentDate.minusYears(startAge);
+            } else if (endAge != null) {
+                startDate = currentDate.minusYears(endAge);
+                endDate = currentDate;
+            }
+
+            if (startDate != null && endDate != null) {
+                Date sqlStartDate = Date.valueOf(startDate);
+                Date sqlEndDate = Date.valueOf(endDate);
+
+                persons = personRepository.findByDateOfBirthBetween(sqlStartDate, sqlEndDate);
+
+                if (persons.isEmpty()) {
+                    throw new NotMatchException("No hay clientes en ese rango de edad");
+                }
+            }
+
+            return ResponseEntity.ok(persons);
+        } catch (NumberFormatException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "", e);
+        } catch (NotMatchException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "", ex);
+        }
     }
+
 
     @ExceptionHandler(NotMatchException.class)
     public ResponseEntity<String> handleNotMatchException(NotMatchException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+    @ExceptionHandler(NumberFormatException.class)
+    public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
 
