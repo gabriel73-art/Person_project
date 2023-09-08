@@ -7,27 +7,26 @@ import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
 import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 //@SecurityRequirement(name = "bearerAuth")
@@ -89,6 +88,15 @@ public class PersonController {
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
                                           @RequestParam("phoneNumber") String phoneNumber,
                                           @RequestParam("address") String[] addresses) throws IOException {
+        try {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateOfBirthStr = dateFormat.format(dateOfBirth);
+            int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
+
+           /* if (year < 1900) {
+                throw new IllegalArgumentException("El año debe ser mayor o igual a 1900.");
+
+            }*/
         Person person=new Person(firstName,secondName,dateOfBirth,phoneNumber);
         String a="";
         if(file!=null){
@@ -102,7 +110,7 @@ public class PersonController {
         //a=a.substring(0,a.length()-1);
         person.setPersonalPhoto(absolute);
         }
-        try {
+        //try {
             Person personsave = personService.savePerson(person);
             if(personsave!=null)
             {
@@ -123,7 +131,6 @@ public class PersonController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
-
     }
 
 
@@ -305,6 +312,8 @@ public class PersonController {
     }
 
 
+
+
     @ExceptionHandler(NotMatchException.class)
     public ResponseEntity<String> handleNotMatchException(NotMatchException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -313,6 +322,20 @@ public class PersonController {
     public ResponseEntity<String> handleNumberFormatException(NumberFormatException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
     }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<String> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
+        // Mensaje de error personalizado
+        String errorMessage = "Error en el parámetro '" + ex.getName() + "'. Valor '" + ex.getValue() + "' no es válido.";
+
+        // Devolver una respuesta de error con el mensaje personalizado
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+  /*  @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }*/
 
 
 }
