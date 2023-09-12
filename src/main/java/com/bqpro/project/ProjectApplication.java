@@ -19,6 +19,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.builder.SpringApplicationBuilder;
+import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -34,7 +36,7 @@ import java.util.Set;
 		scheme = "bearer",
 		bearerFormat = "JWT",
 		in = SecuritySchemeIn.HEADER)*/
-public class ProjectApplication {
+public class ProjectApplication extends SpringBootServletInitializer {
 
 	public static void main(String[] args) {
 		SpringApplication.run(ProjectApplication.class, args);
@@ -95,14 +97,8 @@ public class ProjectApplication {
 		};
 
 	}
-	/*@Bean
-	CommandLineRunner commandLineRunner(RoleRepository roleRepository) {
-		return args -> {
+	@Override
+	protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+		return application.sources(ProjectApplication.class);}
 
-			roleRepository.save(new Role(ERole.valueOf("ROLE_ADMIN")));
-			roleRepository.save(new Role(ERole.valueOf("ROLE_USER")));
-		};
-
-	}*/
-
-}
+	}

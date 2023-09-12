@@ -7,11 +7,13 @@ import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +93,7 @@ public class PersonController {
         try {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
-            int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
+           // int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
 
            /* if (year < 1900) {
                 throw new IllegalArgumentException("El año debe ser mayor o igual a 1900.");
@@ -174,7 +176,7 @@ public class PersonController {
         }
     }
 
-    //@PreAuthorize("hasRole('USER')")
+    //@PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         Optional<Person> existingPerson = personService.getPersonById(id);
