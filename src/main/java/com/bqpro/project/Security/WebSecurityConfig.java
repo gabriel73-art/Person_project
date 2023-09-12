@@ -68,8 +68,8 @@ jsr250Enabled = true)
         http.csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers(HttpMethod.GET,"/**").permitAll()
-                .anyRequest().authenticated();
+                .authorizeRequests().antMatchers("/**").permitAll();
+                //.anyRequest().authenticated();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
