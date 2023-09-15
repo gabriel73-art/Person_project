@@ -34,7 +34,7 @@ public class  SignupRequest {
         this.lastname=lastname;
         this.username=username;
         this.password=password;
-    }******NUEVOS COMENTARIOS*/
+    }*/
 
     public String getFirstname() {
         return firstname;
