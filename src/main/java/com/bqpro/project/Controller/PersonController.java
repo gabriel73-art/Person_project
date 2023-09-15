@@ -103,12 +103,17 @@ public class PersonController {
                         .badRequest()
                         .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
             }
-            if (!isValidPhoneNumber(phoneNumber)) {
-                // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+
+            for (String text : phoneNumber) {
+                if (!isValidPhoneNumber(text)) {
+                    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+                }
+                
             }
+            
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
            // int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
@@ -119,12 +124,16 @@ public class PersonController {
             }*/
         if(personService.reviewString(phoneNumber))
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number repeat !"));
         }
 
         if(personService.reviewString(addresses))
         {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Address repeat !"));
         }
 
         Person person=new Person(firstName,secondName,dateOfBirth);
