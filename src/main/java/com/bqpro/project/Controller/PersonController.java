@@ -191,7 +191,7 @@ public class PersonController {
 
     //@PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/delete/{id}")
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
+    public ResponseEntity<?> deletePerson(@PathVariable Long id) {
         Optional<Person> existingPerson = personService.getPersonById(id);
         if (existingPerson.isPresent()) {
             List<Address> address= existingPerson.get().getAddresses();
@@ -199,9 +199,9 @@ public class PersonController {
                 addressRepository.delete(add);
             }
             personService.deletePerson(id);
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.ok().body(new MessageResponse("User deleted successfully!"));
         } else {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.badRequest().body(new MessageResponse("The ID does'nt exists!"));
         }
     }
 
