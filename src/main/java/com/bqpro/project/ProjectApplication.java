@@ -8,6 +8,7 @@ import com.bqpro.project.Model.Role;
 import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Model.User;
 import com.bqpro.project.Repository.PersonRepository;
+import com.bqpro.project.Repository.PhoneRepository;
 import com.bqpro.project.Repository.RoleRepository;
 import com.bqpro.project.Repository.UserRepository;
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;
@@ -48,7 +49,7 @@ public class ProjectApplication extends SpringBootServletInitializer {
 
 
 	@Bean
-	CommandLineRunner commandLineRunner(PersonRepository personRepository, RoleRepository roleRepository, UserRepository userRepository, AddressRepository addressRepository) {
+	CommandLineRunner commandLineRunner(PersonRepository personRepository, RoleRepository roleRepository, UserRepository userRepository, AddressRepository addressRepository, PhoneRepository phoneRepository) {
 
 		return args -> {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -98,6 +99,11 @@ public class ProjectApplication extends SpringBootServletInitializer {
 			Phone ph3= new Phone();
 			ph3.setText("+1112345678");
 			ph3.setPerson(p3);
+
+			phoneRepository.save(ph1);
+			phoneRepository.save(ph11);
+			phoneRepository.save(ph2);
+			phoneRepository.save(ph3);
 
 			User adminUser = new User("Admin", "User", "admin", encoder.encode("123"));
 			Set<Role> adminRoles = new HashSet<>();
