@@ -23,7 +23,10 @@ public class Person {
     private List<Address> address= new ArrayList<>();
 
     private Date dateOfBirth;
-    private String phoneNumbers;
+
+    @OneToMany(mappedBy = "person")
+    private List<Phone> phoneNumbers= new ArrayList<>();
+
     private String personalPhoto;
 
     // Constructor, getters y setters
@@ -31,20 +34,18 @@ public class Person {
 
     public Person(){}
 
-    public Person(String firstName, String secondName, Date dateOfBirth, String phoneNumbers, String personalPhoto) {
+    public Person(String firstName, String secondName, Date dateOfBirth, String personalPhoto) {
         this.firstName = firstName;
         this.secondName = secondName;
 
         this.dateOfBirth = dateOfBirth;
-        this.phoneNumbers = phoneNumbers;
         this.personalPhoto = personalPhoto;
     }
-    public Person(String firstName, String secondName, Date dateOfBirth, String phoneNumbers) {
+    public Person(String firstName, String secondName, Date dateOfBirth) {
         this.firstName = firstName;
         this.secondName = secondName;
 
         this.dateOfBirth = dateOfBirth;
-        this.phoneNumbers = phoneNumbers;
     }
 
     public Long getId() {
@@ -87,11 +88,11 @@ public class Person {
         this.dateOfBirth = dateOfBirth;
     }
 
-    public String getPhoneNumbers() {
+    public List<Phone> getPhoneNumbers() {
         return this.phoneNumbers;
     }
 
-    public void setPhoneNumbers(String phoneNumbers) {
+    public void setPhoneNumbers(List<Phone> phoneNumbers) {
         this.phoneNumbers = phoneNumbers;
     }
 

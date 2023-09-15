@@ -2,6 +2,7 @@ package com.bqpro.project;
 
 import com.bqpro.project.Enums.ERole;
 import com.bqpro.project.Model.Address;
+import com.bqpro.project.Model.Phone;
 import com.bqpro.project.Model.Person;
 import com.bqpro.project.Model.Role;
 import com.bqpro.project.Repository.AddressRepository;
@@ -52,9 +53,9 @@ public class ProjectApplication extends SpringBootServletInitializer {
 		return args -> {
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-			Person p1=new Person("John", "Doe", new Date(dateFormat.parse("1990-01-01").getTime()), "555-1234", null);
-			Person p2=new Person("Jane", "Smith", new Date(dateFormat.parse("1985-06-15").getTime()), "555-5678", null);
-			Person p3=new Person("Michael", "Johnson", new Date(dateFormat.parse("1992-12-31").getTime()), "555-9876", null);
+			Person p1=new Person("John", "Doe", new Date(dateFormat.parse("1990-01-01").getTime()), null);
+			Person p2=new Person("Jane", "Smith", new Date(dateFormat.parse("1985-06-15").getTime()), null);
+			Person p3=new Person("Michael", "Johnson", new Date(dateFormat.parse("1992-12-31").getTime()), null);
 
 			personRepository.save(p1);
 			personRepository.save(p2);
@@ -82,6 +83,22 @@ public class ProjectApplication extends SpringBootServletInitializer {
 			addressRepository.save(a11);
 			addressRepository.save(a2);
 			addressRepository.save(a3);
+
+			Phone ph1= new Phone();
+			ph1.setText("+5353546000");
+			Phone ph11= new Phone();
+			ph11.setText("+5351699268");
+			ph1.setPerson(p1);
+			ph11.setPerson(p1);
+			
+			Phone ph2= new Phone();
+			ph2.setText("+2401234561");
+			ph2.setPerson(p2);
+
+			Phone ph3= new Phone();
+			ph3.setText("+1112345678");
+			ph3.setPerson(p3);
+
 			User adminUser = new User("Admin", "User", "admin", encoder.encode("123"));
 			Set<Role> adminRoles = new HashSet<>();
 			adminRoles.add(roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role not found.")));

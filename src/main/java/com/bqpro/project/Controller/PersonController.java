@@ -3,8 +3,10 @@ package com.bqpro.project.Controller;
 import com.bqpro.project.Exceptions.NotMatchException;
 import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
+import com.bqpro.project.Model.Phone;
 import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
+import com.bqpro.project.Repository.PhoneRepository;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -40,6 +42,9 @@ public class PersonController {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    PhoneRepository phoneRepository;
 
     @Autowired
     public PersonController(PersonService personService) {
@@ -88,7 +93,7 @@ public class PersonController {
                                           @RequestParam("firstName") String firstName,
                                           @RequestParam("secondName") String secondName,
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
-                                          @RequestParam("phoneNumber") String phoneNumber,
+                                          @RequestParam("phoneNumber") String[] phoneNumber,
                                           @RequestParam("address") String[] addresses) throws IOException {
         try {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
@@ -99,7 +104,17 @@ public class PersonController {
                 throw new IllegalArgumentException("El año debe ser mayor o igual a 1900.");
 
             }*/
-        Person person=new Person(firstName,secondName,dateOfBirth,phoneNumber);
+        if(personService.reviewString(phoneNumber))
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        if(personService.reviewString(addresses))
+        {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+
+        Person person=new Person(firstName,secondName,dateOfBirth);
         String a="";
         if(file!=null){
         int index=file.getOriginalFilename().indexOf(".");
@@ -125,6 +140,16 @@ public class PersonController {
                     addressList.add(addressSave);
                 }
                 personsave.setAddresses(addressList);
+
+                List<Phone> phoneList = new ArrayList<Phone>();
+                for (String text : phoneNumber) {
+                    Phone ph= new Phone();
+                    ph.setText(text);
+                    ph.setPerson(personsave);
+                    Phone phoneSave = phoneRepository.save(ph);
+                    phoneList.add(phoneSave);
+                }
+                personsave.setPhoneNumbers(phoneList);
             }
                 
             return ResponseEntity.status(HttpStatus.OK).body(personsave);

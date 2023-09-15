@@ -2,10 +2,12 @@ package com.bqpro.project.Service;
 
 import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
+import com.bqpro.project.Model.Phone;
 import com.bqpro.project.Repository.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +50,34 @@ public class PersonService {
         }
 
         return find;
+    }
+
+    public boolean findPhoneByPerson(Person person,String phone){
+        boolean find = false;
+        Iterator<Phone> it = person.getPhoneNumbers().iterator();
+        while(it.hasNext() && !find) {
+            Phone itphone = it.next();
+            String ittext= itphone.getText().toLowerCase();
+            if(ittext.contains(phone.toLowerCase()))
+            {
+                find = true;
+            }
+        }
+
+        return find;
+    }
+
+    public boolean reviewString(String[] array){
+        for (int i = 0; i < array.length; i++)
+        {
+            for (int j = i + 1; j < array.length; j++)
+            {
+                if (array[i] != null && array[i].equals(array[j])) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
 
