@@ -387,7 +387,7 @@ public class PersonController {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
         // Mensaje de error personalizado
-        String errorMessage = "Error en el parámetro '" + ex.getName() + "'. Valor '" + ex.getValue() + "' no es válido.";
+        String errorMessage = "Error en el parámetro '" + ex.getName() + "El formato debe ser yyyy-MM-dd.";
 
         // Devolver una respuesta de error con el mensaje personalizado
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
