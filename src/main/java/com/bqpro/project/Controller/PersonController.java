@@ -17,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MultipartFile;
@@ -97,6 +98,11 @@ public class PersonController {
                                           @RequestParam("phoneNumber") String[] phoneNumber,
                                           @RequestParam("address") String[] addresses) throws IOException {
         try {
+            if (firstName.isEmpty()||secondName.isEmpty()||dateOfBirth==null||phoneNumber.length==0||addresses.length==0) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: All Fields are required!"));
+            }
             if (!isValidName(firstName)||!isValidName(secondName)) {
                // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 return ResponseEntity
@@ -386,6 +392,15 @@ public class PersonController {
 
         // Devolver una respuesta de error con el mensaje personalizado
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
+    }
+
+    @ExceptionHandler(MissingServletRequestParameterException.class)
+    public ResponseEntity<?> handleMissingRequestParamException(MissingServletRequestParameterException ex) {
+        String paramName = ex.getParameterName();
+        String errorMessage = "Required request parameters '" + paramName + "' is not present.";
+        List<String> errors = new ArrayList<>();
+        errors.add(errorMessage);
+        return ResponseEntity.badRequest().body(new MessageResponse(errors));
     }
 
   /*  @ExceptionHandler(IllegalArgumentException.class)
