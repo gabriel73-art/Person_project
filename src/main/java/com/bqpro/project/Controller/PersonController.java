@@ -190,8 +190,29 @@ public class PersonController {
 
     //@PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/update/{id}")
-    public ResponseEntity<Person> updatePerson(@PathVariable Long id, @RequestBody Person person) {
+    public ResponseEntity<?> updatePerson(@PathVariable Long id, @RequestBody Person person) {
         Optional<Person> existingPerson = personService.getPersonById(id);
+        if(person.getDateOfBirth()==null)
+        {
+            return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("Error: empty dateOfBirth !"));
+        }
+
+        if(person.getFirstName()==null)
+        {
+            return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("Error: empty firstName !"));
+        }
+
+        if(person.getSecondName()==null)
+        {
+            return ResponseEntity
+            .badRequest()
+            .body(new MessageResponse("Error: empty secondName !"));
+        }
+
         if (existingPerson.isPresent()) {
             person.setId(id);
             Person updatedPerson = personService.savePerson(person);
@@ -221,6 +242,32 @@ public class PersonController {
                 }
             }
             updatedPerson.setAddresses(newsAddress);
+
+            List<Phone> existingPhone = updatedPerson.getPhoneNumbers();
+            List<Phone> newsPhone = updatedPerson.getPhoneNumbers();
+            for (Phone ph : person.getPhoneNumbers()) {
+                Iterator<Phone> it = existingPhone.iterator();
+                boolean find = false;
+                while(it.hasNext()) {
+                    Phone phone = it.next();
+                    if(ph.getId()==phone.getId())
+                    {
+                        find = true;
+                        phone.setText(ph.getText());
+                        phoneRepository.save(phone);
+                    }
+                }
+                if(!find)
+                {
+                    Phone phnew= new Phone();
+                    phnew.setText(ph.getText());
+                    phnew.setPerson(updatedPerson);
+                    Phone phSave = phoneRepository.save(phnew);
+                    newsPhone.add(phSave);
+                    
+                }
+            }
+            updatedPerson.setPhoneNumbers(newsPhone);
 
             return ResponseEntity.ok(updatedPerson);
         } else {
