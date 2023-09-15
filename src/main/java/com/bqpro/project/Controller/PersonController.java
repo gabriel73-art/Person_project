@@ -5,6 +5,7 @@ import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
 import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
+import com.bqpro.project.Response.MessageResponse;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -84,13 +85,25 @@ public class PersonController {
     //@PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
             produces=MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<Person> create(@RequestParam(value = "image", required = false) MultipartFile file,
+    private ResponseEntity<?> create(@RequestParam(value = "image", required = false) MultipartFile file,
                                           @RequestParam("firstName") String firstName,
                                           @RequestParam("secondName") String secondName,
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
                                           @RequestParam("phoneNumber") String phoneNumber,
                                           @RequestParam("address") String[] addresses) throws IOException {
         try {
+            if (!isValidName(firstName)||!isValidName(secondName)) {
+               // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
+            }
+            if (!isValidPhoneNumber(phoneNumber)) {
+                // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+            }
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
            // int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
@@ -311,6 +324,13 @@ public class PersonController {
         } catch (NotMatchException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "", ex);
         }
+    }
+
+    private boolean isValidName(String name) {
+        return name.matches("^[a-zA-Z ]+$");
+    }
+    private boolean isValidPhoneNumber(String phone) {
+        return phone.matches("^\\+[0-9]+$");
     }
 
 
