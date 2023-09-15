@@ -3,8 +3,10 @@ package com.bqpro.project.Controller;
 import com.bqpro.project.Exceptions.NotMatchException;
 import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
+import com.bqpro.project.Model.Phone;
 import com.bqpro.project.Repository.AddressRepository;
 import com.bqpro.project.Repository.PersonRepository;
+import com.bqpro.project.Repository.PhoneRepository;
 import com.bqpro.project.Response.MessageResponse;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
@@ -41,6 +43,9 @@ public class PersonController {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Autowired
+    PhoneRepository phoneRepository;
 
     @Autowired
     public PersonController(PersonService personService) {
@@ -89,7 +94,7 @@ public class PersonController {
                                           @RequestParam("firstName") String firstName,
                                           @RequestParam("secondName") String secondName,
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
-                                          @RequestParam("phoneNumber") String phoneNumber,
+                                          @RequestParam("phoneNumber") String[] phoneNumber,
                                           @RequestParam("address") String[] addresses) throws IOException {
         try {
             if (!isValidName(firstName)||!isValidName(secondName)) {
@@ -98,12 +103,17 @@ public class PersonController {
                         .badRequest()
                         .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
             }
-            if (!isValidPhoneNumber(phoneNumber)) {
-                // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-                return ResponseEntity
-                        .badRequest()
-                        .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+
+            for (String text : phoneNumber) {
+                if (!isValidPhoneNumber(text)) {
+                    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+                }
+                
             }
+            
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
            // int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
@@ -112,7 +122,21 @@ public class PersonController {
                 throw new IllegalArgumentException("El año debe ser mayor o igual a 1900.");
 
             }*/
-        Person person=new Person(firstName,secondName,dateOfBirth,phoneNumber);
+        if(personService.reviewString(phoneNumber))
+        {
+            return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number repeat !"));
+        }
+
+        if(personService.reviewString(addresses))
+        {
+            return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Address repeat !"));
+        }
+
+        Person person=new Person(firstName,secondName,dateOfBirth);
         String a="";
         if(file!=null){
         int index=file.getOriginalFilename().indexOf(".");
@@ -138,6 +162,16 @@ public class PersonController {
                     addressList.add(addressSave);
                 }
                 personsave.setAddresses(addressList);
+
+                List<Phone> phoneList = new ArrayList<Phone>();
+                for (String text : phoneNumber) {
+                    Phone ph= new Phone();
+                    ph.setText(text);
+                    ph.setPerson(personsave);
+                    Phone phoneSave = phoneRepository.save(ph);
+                    phoneList.add(phoneSave);
+                }
+                personsave.setPhoneNumbers(phoneList);
             }
                 
             return ResponseEntity.status(HttpStatus.OK).body(personsave);
