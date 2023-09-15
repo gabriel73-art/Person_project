@@ -95,8 +95,9 @@ public class PersonController {
                                           @RequestParam("secondName") String secondName,
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
                                           @RequestParam("phoneNumber") String[] phoneNumber,
-                                          @RequestParam("address") String[] addresses) throws IOException {
+                                          @RequestParam("address") String address) throws IOException {
         try {
+            String[] addresses = address.split(";");
             if (!isValidName(firstName)||!isValidName(secondName)) {
                // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 return ResponseEntity
@@ -135,6 +136,8 @@ public class PersonController {
                             .badRequest()
                             .body(new MessageResponse("Error: Address repeat !"));
         }
+
+        
 
         Person person=new Person(firstName,secondName,dateOfBirth);
         String a="";
