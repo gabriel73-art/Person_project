@@ -11,6 +11,8 @@ import com.bqpro.project.Response.MessageResponse;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+
+import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
@@ -114,8 +116,16 @@ public class PersonController {
                             .badRequest()
                             .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
                 }
+
+                if(personService.findPhoneExist(text)){
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: "+text+" Phone number must be unique !"));
+                }
                 
             }
+
+            
             
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
@@ -213,9 +223,45 @@ public class PersonController {
             .body(new MessageResponse("Error: empty secondName !"));
         }
 
+        if(person.getAddresses().size()>0)
+        {
+            for(Address ad: person.getAddresses()){
+                if(personService.findAddressByPerson(existingPerson.get(), ad.getText()))
+                {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Address repeat !"));
+                }
+            }
+        }
+
+        if(person.getPhoneNumbers().size()>0)
+        {
+            for(Phone ph: person.getPhoneNumbers()){
+                if (!isValidPhoneNumber(ph.getText())) {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
+                }
+
+                if(personService.findPhoneByPerson(existingPerson.get(), ph.getText()))
+                {
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: Phone number repeat !"));
+                }
+
+                if(personService.findPhoneExist(ph.getText())){
+                    return ResponseEntity
+                            .badRequest()
+                            .body(new MessageResponse("Error: "+ph.getText()+" Phone number must be unique !"));
+                }
+            }
+        }
+
         if (existingPerson.isPresent()) {
             person.setId(id);
-            Person updatedPerson = personService.savePerson(person);
+            Person updatedPerson = existingPerson.get();
             List<Address> existingAddress = updatedPerson.getAddresses();
             List<Address> newsAddress = updatedPerson.getAddresses();
             
@@ -237,11 +283,9 @@ public class PersonController {
                     ad.setText(add.getText());
                     ad.setPerson(updatedPerson);
                     Address addressSave = addressRepository.save(ad);
-                    newsAddress.add(addressSave);
-                    
+                    newsAddress.add(addressSave); 
                 }
             }
-            updatedPerson.setAddresses(newsAddress);
 
             List<Phone> existingPhone = updatedPerson.getPhoneNumbers();
             List<Phone> newsPhone = updatedPerson.getPhoneNumbers();
@@ -257,19 +301,21 @@ public class PersonController {
                         phoneRepository.save(phone);
                     }
                 }
+
                 if(!find)
                 {
                     Phone phnew= new Phone();
                     phnew.setText(ph.getText());
                     phnew.setPerson(updatedPerson);
                     Phone phSave = phoneRepository.save(phnew);
-                    newsPhone.add(phSave);
-                    
+                    newsPhone.add(phSave);   
                 }
             }
-            updatedPerson.setPhoneNumbers(newsPhone);
 
-            return ResponseEntity.ok(updatedPerson);
+            person.setAddresses(existingAddress);
+            person.setPhoneNumbers(existingPhone);
+            Person updatedPersonAll = personService.savePerson(person);
+            return ResponseEntity.ok(updatedPersonAll);
         } else {
             return ResponseEntity.notFound().build();
         }
