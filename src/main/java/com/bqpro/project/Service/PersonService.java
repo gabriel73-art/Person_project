@@ -77,7 +77,7 @@ public class PersonService {
         {
             for (int j = i + 1; j < array.length; j++)
             {
-                if (array[i] != null && array[i].equals(array[j])) {
+                if (array[i].trim() != null && array[i].equals(array[j].trim())) {
                     return true;
                 }
             }

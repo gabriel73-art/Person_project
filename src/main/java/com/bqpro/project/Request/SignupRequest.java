@@ -20,7 +20,7 @@ public class  SignupRequest {
     @Size(min = 3, max = 20)
     private String username;
 
-    //@JsonIgnore
+
     private Set<String> role;
 
     @NotBlank
@@ -31,28 +31,19 @@ public class  SignupRequest {
        super();
     }
 
-   /* public SignupRequest(String firstname, String lastname, String username, String password){
-        this.firstname=firstname;
-        this.lastname=lastname;
-        this.username=username;
-        this.password=password;
-    }*/
+
 
     public String getFirstname() {
         return firstname;
     }
 
-   /* public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }*/
+
 
     public String getLastname() {
         return lastname;
     }
 
-   /* public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }*******NUEVOS COMENTARIOS*/
+
     public String getUsername() {
         return username;
     }
@@ -74,8 +65,6 @@ public class  SignupRequest {
         return this.role;
     }
 
-   /* public void setRole(Set<String> role) {
-       this.role = role;
-    } ******NUEVOS COMENATRIOS*/
+
 }
 

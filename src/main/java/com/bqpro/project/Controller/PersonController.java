@@ -37,7 +37,6 @@ import java.time.LocalDate;
 import java.util.*;
 
 @RestController
-//@SecurityRequirement(name = "bearerAuth")
 @RequestMapping("/persons")
 public class PersonController {
     private final PersonService personService;
@@ -67,28 +66,6 @@ public class PersonController {
         return person.map(ResponseEntity::ok).orElse(ResponseEntity.notFound().build());
     }
 
-    /*@RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
-            produces=MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<Person> create(@RequestPart(value="image", required=false) MultipartFile file, @RequestPart Person person) throws IOException {
-        String a="";
-            int index=file.getOriginalFilename().indexOf(".");
-            String extension;
-            extension="."+file.getOriginalFilename().substring(index+1);
-            String nombreFoto= Calendar.getInstance().getTimeInMillis()+extension;
-            FileUploadUtil.saveFile("person-images",nombreFoto,file);
-            String absolute= Paths.get("person-images").toFile().getAbsolutePath()+ File.separator+nombreFoto;
-           // a=a.concat(nombreFoto+",").trim();
-        //a=a.substring(0,a.length()-1);
-        person.setPersonalPhoto(absolute);
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(personService.savePerson(person));
-        }
-        catch (Exception e){
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
-
-    }*/
 
     //@PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
@@ -103,7 +80,6 @@ public class PersonController {
 
             String[] addresses = address.split(";");
             if (!isValidName(firstName)||!isValidName(secondName)) {
-               // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                 return ResponseEntity
                         .badRequest()
                         .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
@@ -111,7 +87,6 @@ public class PersonController {
 
             for (String text : phoneNumber) {
                 if (!isValidPhoneNumber(text)) {
-                    // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
                     return ResponseEntity
                             .badRequest()
                             .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
@@ -160,11 +135,9 @@ public class PersonController {
         String nombreFoto= Calendar.getInstance().getTimeInMillis()+extension;
         FileUploadUtil.saveFile("person-images",nombreFoto,file);
         String absolute= Paths.get("person-images").toFile().getAbsolutePath()+ File.separator+nombreFoto;
-        // a=a.concat(nombreFoto+",").trim();
-        //a=a.substring(0,a.length()-1);
         person.setPersonalPhoto(absolute);
         }
-        //try {
+
             Person personsave = personService.savePerson(person);
             if(personsave!=null)
             {
@@ -354,9 +327,7 @@ public class PersonController {
         if (secondName != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("secondName"), secondName));
         }
-         /*if (addresses != null) {
-            spec = spec.and((root, query, cb) -> cb.equal(root.get("addresses"), addresses));
-        }*/
+
 
         List<Person> personlist= personRepository.findAll(spec);
         List<Person> newlist= new ArrayList<>();
@@ -377,42 +348,7 @@ public class PersonController {
     }}
 
 
-   /* @GetMapping("/age-range")
-    public ResponseEntity<List<Person>> getPersonsByAgeRange(@RequestParam(value = "startAge", required = false) Integer startAge,
-                                                             @RequestParam(value = "endAge", required = false) Integer endAge) throws NotMatchException{
-        try{
-            List<Person> persons = new ArrayList<>();
-        LocalDate currentDate = LocalDate.now();
-        LocalDate startDate = null;
-        LocalDate endDate = null;
 
-        if (startAge != null && endAge != null) {
-            startDate = currentDate.minusYears(endAge);
-            endDate = currentDate.minusYears(startAge);
-        } else if (startAge != null) {
-            startDate = currentDate.minusYears(200);
-            endDate = currentDate.minusYears(startAge);
-        } else if (endAge != null) {
-            startDate = currentDate.minusYears(endAge);
-            endDate = currentDate;
-        }
-
-        if (startDate != null && endDate != null) {
-            Date sqlStartDate = Date.valueOf(startDate);
-            Date sqlEndDate = Date.valueOf(endDate);
-
-             persons = personRepository.findByDateOfBirthBetween(sqlStartDate, sqlEndDate);
-            //return ResponseEntity.ok(persons);
-            if(persons==null)
-                throw new NotMatchException("There is no clients for that age range");
-
-        }
-            return ResponseEntity.ok(persons);
-        }
-        catch (NotMatchException ex){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"", ex);
-    }
-    }*/
 
     @GetMapping("/age-range")
     public ResponseEntity<List<Person>> getPersonsByAgeRange(
@@ -479,10 +415,10 @@ public class PersonController {
 
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<String> handleMethodArgumentTypeMismatch(MethodArgumentTypeMismatchException ex) {
-        // Mensaje de error personalizado
+
         String errorMessage = "Error en el parámetro '" + ex.getName() + ". El formato debe ser yyyy-MM-dd.";
 
-        // Devolver una respuesta de error con el mensaje personalizado
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorMessage);
     }
 
@@ -495,10 +431,6 @@ public class PersonController {
         return ResponseEntity.badRequest().body(new MessageResponse(errors));
     }
 
-  /*  @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<String> handleIllegalArgumentException(IllegalArgumentException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-    }*/
 
 
 }
