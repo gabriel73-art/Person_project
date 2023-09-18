@@ -198,6 +198,7 @@ public class PersonController {
             .body(new MessageResponse("Error: empty secondName !"));
         }
 
+        if (existingPerson.isPresent()) {
         if(person.getAddresses().size()>0)
         {
             for(Address ad: person.getAddresses()){
@@ -208,6 +209,8 @@ public class PersonController {
                             .body(new MessageResponse("Error: Address repeat !"));
                 }
             }
+        }}else {
+            return ResponseEntity.badRequest().body(new MessageResponse("That person does'nt exists!"));
         }
 
         if(person.getPhoneNumbers().size()>0)
@@ -234,7 +237,6 @@ public class PersonController {
             }
         }
 
-        if (existingPerson.isPresent()) {
             person.setId(id);
             Person updatedPerson = existingPerson.get();
             List<Address> existingAddress = updatedPerson.getAddresses();
@@ -291,9 +293,7 @@ public class PersonController {
             person.setPhoneNumbers(existingPhone);
             Person updatedPersonAll = personService.savePerson(person);
             return ResponseEntity.ok(updatedPersonAll);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+
     }
 
     //@PreAuthorize("hasRole('ADMIN')")
