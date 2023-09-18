@@ -104,12 +104,14 @@ public class PersonController {
             
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
         String dateOfBirthStr = dateFormat.format(dateOfBirth);
-           // int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
+            int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
 
-           /* if (year < 1900) {
-                throw new IllegalArgumentException("El año debe ser mayor o igual a 1900.");
+            if (year < 1900) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: Year can't be lower than 1900 !"));
 
-            }*/
+            }
         if(personService.reviewString(phoneNumber))
         {
             return ResponseEntity

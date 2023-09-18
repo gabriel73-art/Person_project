@@ -55,7 +55,6 @@ public class AuthController {
                     .body(new MessageResponse("Error: All Fields are required!"));
         }
         if (!isValidName(signUpRequest.getFirstname())||!isValidName(signUpRequest.getLastname())) {
-            // return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
             return ResponseEntity
                     .badRequest()
                     .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
