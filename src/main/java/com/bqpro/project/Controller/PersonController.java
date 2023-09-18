@@ -146,7 +146,7 @@ public class PersonController {
                 List<Address> addressList = new ArrayList<Address>();
                 for (String text : addresses) {
                     Address ad= new Address();
-                    ad.setText(text);
+                    ad.setText(text.trim());
                     ad.setPerson(personsave);
                     Address addressSave = addressRepository.save(ad);
                     addressList.add(addressSave);
