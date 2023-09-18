@@ -305,6 +305,10 @@ public class PersonController {
             for (Address add : address) {
                 addressRepository.delete(add);
             }
+            List<Phone> phones= existingPerson.get().getPhoneNumbers();
+            for (Phone ph : phones) {
+                phoneRepository.delete(ph);
+            }
             personService.deletePerson(id);
             return ResponseEntity.ok().body(new MessageResponse("User deleted successfully!"));
         } else {
