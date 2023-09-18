@@ -48,6 +48,17 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+
+        if (signUpRequest.getFirstname().isEmpty()||signUpRequest.getLastname().isEmpty()||signUpRequest.getUsername().isEmpty()||signUpRequest.getPassword().isEmpty()) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: All Fields are required!"));
+        }
+        if (!isValidName(signUpRequest.getFirstname())||!isValidName(signUpRequest.getLastname())) {
+            return ResponseEntity
+                    .badRequest()
+                    .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
+        }
         if (userRepository.existsByUsername(signUpRequest.getUsername())) {
             return ResponseEntity
                     .badRequest()
@@ -84,6 +95,10 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    private boolean isValidName(String name) {
+        return name.matches("^[a-zA-Z ]+$");
     }
     }
 

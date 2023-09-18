@@ -1,5 +1,7 @@
 package com.bqpro.project.Request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
@@ -29,28 +31,19 @@ public class  SignupRequest {
        super();
     }
 
-   /* public SignupRequest(String firstname, String lastname, String username, String password){
-        this.firstname=firstname;
-        this.lastname=lastname;
-        this.username=username;
-        this.password=password;
-    }******NUEVOS COMENTARIOS*/
+
 
     public String getFirstname() {
         return firstname;
     }
 
-   /* public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }*/
+
 
     public String getLastname() {
         return lastname;
     }
 
-   /* public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }*******NUEVOS COMENTARIOS*/
+
     public String getUsername() {
         return username;
     }
@@ -72,8 +65,6 @@ public class  SignupRequest {
         return this.role;
     }
 
-   /* public void setRole(Set<String> role) {
-       this.role = role;
-    } ******NUEVOS COMENATRIOS*/
+
 }
 
