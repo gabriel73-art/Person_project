@@ -1,5 +1,7 @@
 package com.bqpro.project.Request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 import java.util.Set;
@@ -18,7 +20,7 @@ public class  SignupRequest {
     @Size(min = 3, max = 20)
     private String username;
 
-
+    //@JsonIgnore
     private Set<String> role;
 
     @NotBlank
