@@ -84,7 +84,7 @@ public class PersonService {
         spec = spec.and((root, query, cb) -> cb.equal(root.get("text"), phone));
         List<Phone> phonelist= phoneRepository.findAll(spec);
 
-        return phonelist.isEmpty()?false: true;
+        return !phonelist.isEmpty();
     }
 
 }

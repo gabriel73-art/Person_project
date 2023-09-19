@@ -346,7 +346,7 @@ public class PersonController {
             response="Error: empty secondName !";
         }
 
-        if(person.getAddresses().size()>0)
+        if(!person.getAddresses().isEmpty())
         {
             String[] strings= new String[person.getAddresses().size()];
             int index=0;
@@ -359,7 +359,7 @@ public class PersonController {
                 response="Error: Address repeat !";
         }
 
-        if(person.getPhoneNumbers().size()>0)
+        if(!person.getPhoneNumbers().isEmpty())
         {
             String[] strings= new String[person.getPhoneNumbers().size()];
             int index=0;
@@ -377,7 +377,7 @@ public class PersonController {
 
     private String validPersonAddresAndPhones(Person existingPerson, Person person){
         String response="";
-        if(person.getAddresses().size()>0)
+        if(!person.getAddresses().isEmpty())
         {
             for(Address ad: person.getAddresses()){
                 if(personService.findAddressByPerson(existingPerson, ad.getText()))
@@ -387,7 +387,7 @@ public class PersonController {
             }
         }
 
-        if(person.getPhoneNumbers().size()>0)
+        if(!person.getPhoneNumbers().isEmpty())
         {
             for(Phone ph: person.getPhoneNumbers()){
                 if (!isValidPhoneNumber(ph.getText())) {
