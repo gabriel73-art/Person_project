@@ -266,7 +266,7 @@ public class PersonController {
         return name.matches("^[a-zA-Z ]+$");
     }
     private boolean isValidPhoneNumber(String phone) {
-        return phone.matches("^\\+[0-9 ]+$");
+        return phone.matches("^\\+[0-9 ]+[^ ]$");
     }
     private boolean isDateOfBirthValid(Date dateOfBirth) {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
