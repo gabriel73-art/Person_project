@@ -377,31 +377,27 @@ public class PersonController {
 
     private String validPersonAddresAndPhones(Person existingPerson, Person person){
         String response="";
-        if(!person.getAddresses().isEmpty())
-        {
-            for(Address ad: person.getAddresses()){
-                if(personService.findAddressByPerson(existingPerson, ad.getText()))
-                {
-                    response="Error: Address repeat !";
-                }
+
+        for(Address ad: person.getAddresses()){
+            if(personService.findAddressByPerson(existingPerson, ad.getText()))
+            {
+                response="Error: Address repeat !";
             }
         }
 
-        if(!person.getPhoneNumbers().isEmpty())
-        {
-            for(Phone ph: person.getPhoneNumbers()){
-                if (!isValidPhoneNumber(ph.getText())) {
-                    response="Error: Phone number must starts with character + and contains only numbers !";
-                }
 
-                if(personService.findPhoneByPerson(existingPerson, ph.getText()))
-                {
-                    response="Error: Phone number repeat !";
-                }
+        for(Phone ph: person.getPhoneNumbers()){
+            if (!isValidPhoneNumber(ph.getText())) {
+                response="Error: Phone number must starts with character + and contains only numbers !";
+            }
 
-                if(personService.findPhoneExist(ph.getText())){
-                    response="Error: "+ph.getText()+" Phone number must be unique !";
-                }
+            if(personService.findPhoneByPerson(existingPerson, ph.getText()))
+            {
+                response="Error: Phone number repeat !";
+            }
+
+            if(personService.findPhoneExist(ph.getText())){
+                response="Error: "+ph.getText()+" Phone number must be unique !";
             }
         }
 
