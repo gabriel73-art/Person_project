@@ -9,6 +9,7 @@ import com.bqpro.project.Repository.PersonRepository;
 import com.bqpro.project.Repository.PhoneRepository;
 import com.bqpro.project.Response.MessageResponse;
 import com.bqpro.project.Service.PersonService;
+import com.bqpro.project.Specifications.PersonSpecifications;
 import com.bqpro.project.Utils.FileUploadUtil;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
@@ -89,8 +90,6 @@ public class PersonController {
                         .badRequest()
                         .body(new MessageResponse("Error: Phone numbers are not valid, must starts with character + and contains only numbers or already exists in Database !"));
             }
-
-
             if (!isDateOfBirthValid(dateOfBirth)) {
                 return ResponseEntity
                         .badRequest()
@@ -110,12 +109,12 @@ public class PersonController {
                             .body(new MessageResponse("Error: Address repeat !"));
         }
         Person person=new Person(firstName,secondName,dateOfBirth);
-            person.setPersonalPhoto(createFile(file));
-            Person personsave = personService.savePerson(person);
+        person.setPersonalPhoto(createFile(file));
+        Person personsave = personService.savePerson(person);
 
-                personsave.setAddresses(createAndSaveAddresses(addresses,person));
+        personsave.setAddresses(createAndSaveAddresses(addresses,person));
 
-                personsave.setPhoneNumbers(createAndSavePhone(phoneNumber, person));
+        personsave.setPhoneNumbers(createAndSavePhone(phoneNumber, person));
                 
             return ResponseEntity.status(HttpStatus.OK).body(person);
         }
@@ -277,7 +276,6 @@ public class PersonController {
     ) throws NotMatchException {
     try {
 
-
         Specification<Person> spec = Specification.where(null);
 
         if (firstName != null) {
@@ -286,27 +284,22 @@ public class PersonController {
         if (secondName != null) {
             spec = spec.and((root, query, cb) -> cb.equal(root.get("secondName"), secondName));
         }
+        if (addresses != null) {
+            spec = spec.and(PersonSpecifications.hasAddresses(addresses));
 
+        }
 
         List<Person> personlist= personRepository.findAll(spec);
-        List<Person> newlist= new ArrayList<>();
-        if (addresses != null) {
-            for (Person person : personlist) {
-                if (personService.findAddressByPerson(person, addresses))
-                    newlist.add(person);
-            }
-        }
-        if(personlist==null && newlist==null)
+
+        if(personlist.isEmpty())
             throw new NotMatchException("There is no clients for that specifications");
-        return addresses!= null?newlist:personlist;
+
+        return personlist;
     }
         catch (NotMatchException ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"", ex);
 
-
     }}
-
-
 
 
     @GetMapping("/age-range")
