@@ -141,101 +141,31 @@ public class PersonController {
 
 
         if (existingPerson.isPresent()) {
-        if(person.getAddresses().size()>0)
-        {
-            for(Address ad: person.getAddresses()){
-                if(personService.findAddressByPerson(existingPerson.get(), ad.getText()))
-                {
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: Address repeat !"));
-                }
-            }
-        }}else {
-            return ResponseEntity.badRequest().body(new MessageResponse("That person does'nt exists!"));
-        }
 
-        if(person.getPhoneNumbers().size()>0)
-        {
-            for(Phone ph: person.getPhoneNumbers()){
-                if (!isValidPhoneNumber(ph.getText())) {
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
-                }
-
-                if(personService.findPhoneByPerson(existingPerson.get(), ph.getText()))
-                {
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: Phone number repeat !"));
-                }
-
-                if(personService.findPhoneExist(ph.getText())){
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: "+ph.getText()+" Phone number must be unique !"));
-                }
-            }
-        }
+            String validPersonAP= validPersonAddresAndPhones(existingPerson.get(), person); 
+            if(validPersonAP!="")
+            {
+                return ResponseEntity
+                .badRequest()
+                .body(new MessageResponse(validPersonAP));
+            }   
 
             person.setId(id);
             Person updatedPerson = existingPerson.get();
             List<Address> existingAddress = updatedPerson.getAddresses();
-            List<Address> newsAddress = updatedPerson.getAddresses();
-            
-            for (Address add : person.getAddresses()) {
-                Iterator<Address> it = existingAddress.iterator();
-                boolean find = false;
-                while(it.hasNext()) {
-                    Address address = it.next();
-                    if(add.getId()==address.getId())
-                    {
-                        find = true;
-                        address.setText(add.getText());
-                        addressRepository.save(address);
-                    }
-                }
-                if(!find)
-                {
-                    Address ad= new Address();
-                    ad.setText(add.getText());
-                    ad.setPerson(updatedPerson);
-                    Address addressSave = addressRepository.save(ad);
-                    newsAddress.add(addressSave); 
-                }
-            }
+            updateAndSaveAddress(existingAddress, person, updatedPerson);
 
             List<Phone> existingPhone = updatedPerson.getPhoneNumbers();
-            List<Phone> newsPhone = updatedPerson.getPhoneNumbers();
-            for (Phone ph : person.getPhoneNumbers()) {
-                Iterator<Phone> it = existingPhone.iterator();
-                boolean find = false;
-                while(it.hasNext()) {
-                    Phone phone = it.next();
-                    if(ph.getId()==phone.getId())
-                    {
-                        find = true;
-                        phone.setText(ph.getText());
-                        phoneRepository.save(phone);
-                    }
-                }
-
-                if(!find)
-                {
-                    Phone phnew= new Phone();
-                    phnew.setText(ph.getText());
-                    phnew.setPerson(updatedPerson);
-                    Phone phSave = phoneRepository.save(phnew);
-                    newsPhone.add(phSave);   
-                }
-            }
+            updateAndSavePhones(existingPhone, person, updatedPerson);
 
             person.setAddresses(existingAddress);
             person.setPhoneNumbers(existingPhone);
             Person updatedPersonAll = personService.savePerson(person);
             return ResponseEntity.ok(updatedPersonAll);
 
+        }else {
+            return ResponseEntity.badRequest().body(new MessageResponse("That person does'nt exists!"));
+        }
     }
 
     //@PreAuthorize("hasRole('ADMIN')")
@@ -445,6 +375,86 @@ public class PersonController {
         }
 
         return response;
+    }
+
+    private String validPersonAddresAndPhones(Person existingPerson, Person person){
+        String response="";
+        if(person.getAddresses().size()>0)
+        {
+            for(Address ad: person.getAddresses()){
+                if(personService.findAddressByPerson(existingPerson, ad.getText()))
+                {
+                    response="Error: Address repeat !";
+                }
+            }
+        }
+
+        if(person.getPhoneNumbers().size()>0)
+        {
+            for(Phone ph: person.getPhoneNumbers()){
+                if (!isValidPhoneNumber(ph.getText())) {
+                    response="Error: Phone number must starts with character + and contains only numbers !";
+                }
+
+                if(personService.findPhoneByPerson(existingPerson, ph.getText()))
+                {
+                    response="Error: Phone number repeat !";
+                }
+
+                if(personService.findPhoneExist(ph.getText())){
+                    response="Error: "+ph.getText()+" Phone number must be unique !";
+                }
+            }
+        }
+
+        return response;
+    }
+
+    private void updateAndSaveAddress(List<Address> existingAddress, Person person, Person updatedPerson){
+        for (Address add : person.getAddresses()) {
+            Iterator<Address> it = existingAddress.iterator();
+            boolean find = false;
+            while(it.hasNext()) {
+                Address address = it.next();
+                if(add.getId()==address.getId())
+                {
+                    find = true;
+                    address.setText(add.getText());
+                    addressRepository.save(address);
+                }
+            }
+            if(!find)
+            {
+                Address ad= new Address();
+                ad.setText(add.getText());
+                ad.setPerson(updatedPerson);
+                addressRepository.save(ad); 
+            }
+        }
+    }
+
+    private void updateAndSavePhones(List<Phone> existingPhone, Person person, Person updatedPerson){
+        for (Phone ph : person.getPhoneNumbers()) {
+            Iterator<Phone> it = existingPhone.iterator();
+            boolean find = false;
+            while(it.hasNext()) {
+                Phone phone = it.next();
+                if(ph.getId()==phone.getId())
+                {
+                    find = true;
+                    phone.setText(ph.getText());
+                    phoneRepository.save(phone);
+                }
+            }
+
+            if(!find)
+            {
+                Phone phnew= new Phone();
+                phnew.setText(ph.getText());
+                phnew.setPerson(updatedPerson);
+                phoneRepository.save(phnew); 
+            }
+        }
     }
 
 

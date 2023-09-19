@@ -77,16 +77,6 @@ public class PersonService {
             uniqueValues.add(trimmedValue);
         }
         return uniqueValues.size() != values.length;
-        /*for (int i = 0; i < array.length; i++)
-        {
-            for (int j = i + 1; j < array.length; j++)
-            {
-                if (array[i].trim() != null && array[i].equals(array[j].trim())) {
-                    return true;
-                }
-            }
-        }*/
-       // return false;
     }
 
     public boolean findPhoneExist(String phone){
