@@ -61,7 +61,7 @@ public class AuthenticationService {
 
         User user = findByLogin(login);
 
-        if (!hmac.equals(calculateHmac(user)) || userId != user.getId()) {
+        if (!hmac.equals(calculateHmac(user)) || !userId.equals(user.getId())) {
             throw new InvalidCookieValueException("Invalid Cookie value");
         }
 
