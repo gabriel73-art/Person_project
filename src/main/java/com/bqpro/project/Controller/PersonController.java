@@ -1,5 +1,37 @@
 package com.bqpro.project.Controller;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MissingServletRequestParameterException;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
+
 import com.bqpro.project.Exceptions.NotMatchException;
 import com.bqpro.project.Model.Address;
 import com.bqpro.project.Model.Person;
@@ -10,31 +42,6 @@ import com.bqpro.project.Repository.PhoneRepository;
 import com.bqpro.project.Response.MessageResponse;
 import com.bqpro.project.Service.PersonService;
 import com.bqpro.project.Utils.FileUploadUtil;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-
-import org.hibernate.resource.jdbc.spi.PhysicalConnectionHandlingMode;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.domain.Specification;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.MissingServletRequestParameterException;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
-
-import javax.validation.Valid;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Pattern;
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.util.*;
 
 @RestController
 @RequestMapping("/persons")
@@ -152,11 +159,9 @@ public class PersonController {
 
             person.setId(id);
             Person updatedPerson = existingPerson.get();
-            List<Address> existingAddress = updatedPerson.getAddresses();
-            updateAndSaveAddress(existingAddress, person, updatedPerson);
-
-            List<Phone> existingPhone = updatedPerson.getPhoneNumbers();
-            updateAndSavePhones(existingPhone, person, updatedPerson);
+            
+            List<Address> existingAddress = updateAndSaveAddress(person, updatedPerson);
+            List<Phone> existingPhone = updateAndSavePhones(person, updatedPerson);
 
             person.setAddresses(existingAddress);
             person.setPhoneNumbers(existingPhone);
@@ -410,7 +415,8 @@ public class PersonController {
         return response;
     }
 
-    private void updateAndSaveAddress(List<Address> existingAddress, Person person, Person updatedPerson){
+    private List<Address> updateAndSaveAddress(Person person, Person updatedPerson){
+        List<Address> existingAddress = updatedPerson.getAddresses();
         for (Address add : person.getAddresses()) {
             Iterator<Address> it = existingAddress.iterator();
             boolean find = false;
@@ -429,11 +435,14 @@ public class PersonController {
                 ad.setText(add.getText());
                 ad.setPerson(updatedPerson);
                 addressRepository.save(ad); 
+                existingAddress.add(ad);
             }
         }
+        return existingAddress;
     }
 
-    private void updateAndSavePhones(List<Phone> existingPhone, Person person, Person updatedPerson){
+    private List<Phone> updateAndSavePhones(Person person, Person updatedPerson){
+        List<Phone> existingPhone = updatedPerson.getPhoneNumbers();
         for (Phone ph : person.getPhoneNumbers()) {
             Iterator<Phone> it = existingPhone.iterator();
             boolean find = false;
@@ -453,8 +462,10 @@ public class PersonController {
                 phnew.setText(ph.getText());
                 phnew.setPerson(updatedPerson);
                 phoneRepository.save(phnew); 
+                existingPhone.add(phnew);
             }
         }
+        return existingPhone;
     }
 
 
