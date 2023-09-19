@@ -8,6 +8,8 @@ import javax.persistence.criteria.Subquery;
 
 public class PersonSpecifications {
 
+    private PersonSpecifications() {}
+
     public static Specification<Person> hasFirstName(String firstName) {
         return (root, query, cb) -> cb.equal(root.get("firstName"), firstName);
     }

@@ -30,12 +30,6 @@ public class UserService {
     AuthenticationManager authenticationManager;
 
 
-    private final PasswordEncoder passwordEncoder;
-
-    public UserService(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-    }
-
     public User create(User user){
         return userRepository.save(user);
     }

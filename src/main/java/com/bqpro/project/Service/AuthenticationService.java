@@ -1,5 +1,9 @@
 package com.bqpro.project.Service;
 
+import com.bqpro.project.Exceptions.HmacCalculationException;
+import com.bqpro.project.Exceptions.InvalidCookieValueException;
+import com.bqpro.project.Exceptions.InvalidLoginException;
+import com.bqpro.project.Exceptions.InvalidPasswordException;
 import com.bqpro.project.Model.Credentials;
 import com.bqpro.project.Model.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,19 +33,19 @@ public class AuthenticationService {
 
     public User authenticate(Credentials credentialsDto) {
         String encodedMasterPassword = passwordEncoder.encode(CharBuffer.wrap("1234"));
-        System.out.println(credentialsDto.getPassword());
-        System.out.println(credentialsDto.getLogin());
+      /*  System.out.println(credentialsDto.getPassword());
+        System.out.println(credentialsDto.getLogin());*/
         if (passwordEncoder.matches(CharBuffer.wrap(credentialsDto.getPassword()), encodedMasterPassword)) {
             return new User();
         }
-        throw new RuntimeException("Invalid password");
+        throw new InvalidPasswordException("Invalid password");
     }
 
     public User findByLogin(String login) {
         if ("login".equals(login)) {
             return new User();
         }
-        throw new RuntimeException("Invalid login");
+        throw new InvalidLoginException("Invalid login");
     }
 
     public String createToken(User user) {
@@ -58,7 +62,7 @@ public class AuthenticationService {
         User user = findByLogin(login);
 
         if (!hmac.equals(calculateHmac(user)) || userId != user.getId()) {
-            throw new RuntimeException("Invalid Cookie value");
+            throw new InvalidCookieValueException("Invalid Cookie value");
         }
 
         return user;
@@ -77,7 +81,7 @@ public class AuthenticationService {
             return Base64.getEncoder().encodeToString(hmacBytes);
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            throw new RuntimeException(e);
+            throw new HmacCalculationException("Error calculating Hmac",e);
         }
     }
 }

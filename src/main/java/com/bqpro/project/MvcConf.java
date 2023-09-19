@@ -13,7 +13,6 @@ public class MvcConf implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry){
         WebMvcConfigurer.super.addResourceHandlers(registry);
         exposeDirectory("person-images", registry);
-        // registry.addResourceHandler("/imagenEcc/**").addResourceLocations("file:/C:/imagenEcc/");
     }
 
     private void exposeDirectory(String dirName, ResourceHandlerRegistry registry) {

@@ -8,7 +8,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 
 public class FileUploadUtil {
-    private Path path;
 
     public static void saveFile(String uploadDir, String fileName,
                                 MultipartFile multipartFile) throws IOException {

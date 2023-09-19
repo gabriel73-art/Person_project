@@ -27,7 +27,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
   prePostEnabled = true,
 securedEnabled = true,
 jsr250Enabled = true)
-//public class WebSecurityConfig implements WebMvcConfigurer{
   public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 
@@ -69,7 +68,6 @@ jsr250Enabled = true)
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests().antMatchers("/**").permitAll();
-                //.anyRequest().authenticated();
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
     }
