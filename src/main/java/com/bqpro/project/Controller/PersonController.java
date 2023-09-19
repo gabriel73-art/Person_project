@@ -130,7 +130,7 @@ public class PersonController {
         Optional<Person> existingPerson = personService.getPersonById(id);
 
         String validRequest= validPersonRequest(person);
-        if(validRequest!="")
+        if(!validRequest.equals(""))
         {
             return ResponseEntity
             .badRequest()
@@ -141,7 +141,7 @@ public class PersonController {
         if (existingPerson.isPresent()) {
 
             String validPersonAP= validPersonAddresAndPhones(existingPerson.get(), person); 
-            if(validPersonAP!="")
+            if(!validPersonAP.equals(""))
             {
                 return ResponseEntity
                 .badRequest()
@@ -413,7 +413,7 @@ public class PersonController {
             if(!find)
             {
                 Address ad= new Address();
-                ad.setText(add.getText());
+                ad.setText(add.getText().trim());
                 ad.setPerson(updatedPerson);
                 addressRepository.save(ad); 
                 existingAddress.add(ad);
@@ -440,7 +440,7 @@ public class PersonController {
             if(!find)
             {
                 Phone phnew= new Phone();
-                phnew.setText(ph.getText());
+                phnew.setText(ph.getText().trim());
                 phnew.setPerson(updatedPerson);
                 phoneRepository.save(phnew); 
                 existingPhone.add(phnew);
