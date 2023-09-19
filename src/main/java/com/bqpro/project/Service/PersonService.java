@@ -46,7 +46,7 @@ public class PersonService {
         while(it.hasNext() && !find) {
             Address itaddress = it.next();
             String ittext= itaddress.getText().toLowerCase();
-            if(ittext.contains(address.toLowerCase()))
+            if(ittext.contains(address.toLowerCase().trim()))
             {
                 find = true;
             }
@@ -61,7 +61,7 @@ public class PersonService {
         while(it.hasNext() && !find) {
             Phone itphone = it.next();
             String ittext= itphone.getText().toLowerCase();
-            if(ittext.contains(phone.toLowerCase()))
+            if(ittext.contains(phone.toLowerCase().trim()))
             {
                 find = true;
             }
