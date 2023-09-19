@@ -177,26 +177,15 @@ public class PersonController {
     @PutMapping("/update/{id}")
     public ResponseEntity<?> updatePerson(@PathVariable Long id, @RequestBody Person person) {
         Optional<Person> existingPerson = personService.getPersonById(id);
-        if(person.getDateOfBirth()==null)
+
+        String validRequest= validPersonRequest(person);
+        if(validRequest!="")
         {
             return ResponseEntity
             .badRequest()
-            .body(new MessageResponse("Error: empty dateOfBirth !"));
+            .body(new MessageResponse(validRequest));
         }
 
-        if(person.getFirstName()==null)
-        {
-            return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("Error: empty firstName !"));
-        }
-
-        if(person.getSecondName()==null)
-        {
-            return ResponseEntity
-            .badRequest()
-            .body(new MessageResponse("Error: empty secondName !"));
-        }
 
         if (existingPerson.isPresent()) {
         if(person.getAddresses().size()>0)
@@ -405,6 +394,52 @@ public class PersonController {
     }
     private boolean isValidPhoneNumber(String phone) {
         return phone.matches("^\\+[0-9 ]+$");
+    }
+
+    private String validPersonRequest(Person person){
+        String response="";
+        if(person.getDateOfBirth()==null)
+        {
+            response="Error: empty dateOfBirth !";
+        }
+
+        if(person.getFirstName()==null)
+        {
+            response="Error: empty firstName !";
+        }
+
+        if(person.getSecondName()==null)
+        {
+            response="Error: empty secondName !";
+        }
+
+        if(person.getAddresses().size()>0)
+        {
+            String[] strings= new String[person.getAddresses().size()];
+            int index=0;
+            for(Address ad: person.getAddresses()){
+                strings[index] = ad.getText();
+                index++;
+            }
+
+            if(personService.reviewString(strings))
+                response="Error: Address repeat !";
+        }
+
+        if(person.getPhoneNumbers().size()>0)
+        {
+            String[] strings= new String[person.getPhoneNumbers().size()];
+            int index=0;
+            for(Phone ph: person.getPhoneNumbers()){
+                strings[index] = ph.getText();
+                index++;
+            }
+
+            if(personService.reviewString(strings))
+                response="Error: Phones repeat !";
+        }
+
+        return response;
     }
 
 
