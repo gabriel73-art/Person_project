@@ -39,6 +39,7 @@ import com.bqpro.project.Utils.FileUploadUtil;
 @RequestMapping("/persons")
 public class PersonController {
     private final PersonService personService;
+    private final String ADDRESS_REPEAT="Error: Address repeat !";
     @Autowired
     PersonRepository personRepository;
 
@@ -104,7 +105,7 @@ public class PersonController {
         {
             return ResponseEntity
                             .badRequest()
-                            .body(new MessageResponse("Error: Address repeat !"));
+                            .body(new MessageResponse(ADDRESS_REPEAT));
         }
         Person person=new Person(firstName,secondName,dateOfBirth);
         person.setPersonalPhoto(createFile(file));
@@ -282,17 +283,17 @@ public class PersonController {
         return true;
     }
     private String createFile( MultipartFile file) throws IOException {
-        //Person person = new Person();
-
         if (file != null) {
+            try {
             int index = file.getOriginalFilename().indexOf(".");
             String extension = "." + file.getOriginalFilename().substring(index + 1);
             String nombreFoto = Calendar.getInstance().getTimeInMillis() + extension;
             FileUploadUtil.saveFile("person-images", nombreFoto, file);
-            String absolute = Paths.get("person-images").toFile().getAbsolutePath() + File.separator + nombreFoto;
-            return absolute ;
+            return Paths.get("person-images").toFile().getAbsolutePath() + File.separator + nombreFoto;
+        }catch(NullPointerException e){
+                e.printStackTrace();
+            }
         }
-
         return null;
     }
     private List<Address> createAndSaveAddresses(String[] addresses, Person personsave) {
@@ -347,7 +348,7 @@ public class PersonController {
             }
 
             if(personService.reviewString(strings))
-                response="Error: Address repeat !";
+                response=ADDRESS_REPEAT;
         }
 
         if(!person.getPhoneNumbers().isEmpty())
@@ -372,7 +373,7 @@ public class PersonController {
         for(Address ad: person.getAddresses()){
             if(personService.findAddressByPerson(existingPerson, ad.getText()))
             {
-                response="Error: Address repeat !";
+                response=ADDRESS_REPEAT;
             }
         }
 
@@ -476,6 +477,13 @@ public class PersonController {
         List<String> errors = new ArrayList<>();
         errors.add(errorMessage);
         return ResponseEntity.badRequest().body(new MessageResponse(errors));
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<String> handleNullPointerException(NullPointerException e) {
+        String errorMessage = "There is an error in the file.";
+
+        return ResponseEntity.badRequest().body(errorMessage);
     }
 
 
