@@ -84,33 +84,17 @@ public class PersonController {
                         .badRequest()
                         .body(new MessageResponse("Error: Firstname or Secondname contains stranger characters !"));
             }
-
-            for (String text : phoneNumber) {
-                if (!isValidPhoneNumber(text)) {
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: Phone number must starts with character + and contains only numbers !"));
-                }
-
-                if(personService.findPhoneExist(text)){
-                    return ResponseEntity
-                            .badRequest()
-                            .body(new MessageResponse("Error: "+text+" Phone number must be unique !"));
-                }
-                
-            }
-
-            
-            
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String dateOfBirthStr = dateFormat.format(dateOfBirth);
-            int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
-
-            if (year < 1900) {
+            if (!arePhoneNumbersValid(phoneNumber)) {
                 return ResponseEntity
                         .badRequest()
-                        .body(new MessageResponse("Error: Year can't be lower than 1900 !"));
+                        .body(new MessageResponse("Error: Phone numbers are not valid, must starts with character + and contains only numbers or already exists in Database !"));
+            }
 
+
+            if (!isDateOfBirthValid(dateOfBirth)) {
+                return ResponseEntity
+                        .badRequest()
+                        .body(new MessageResponse("Error: Invalid date of birth. Year can't be lower than 1900 !"));
             }
         if(personService.reviewString(phoneNumber))
         {
@@ -125,46 +109,15 @@ public class PersonController {
                             .badRequest()
                             .body(new MessageResponse("Error: Address repeat !"));
         }
-
-        
-
         Person person=new Person(firstName,secondName,dateOfBirth);
-        String a="";
-        if(file!=null){
-        int index=file.getOriginalFilename().indexOf(".");
-        String extension;
-        extension="."+file.getOriginalFilename().substring(index+1);
-        String nombreFoto= Calendar.getInstance().getTimeInMillis()+extension;
-        FileUploadUtil.saveFile("person-images",nombreFoto,file);
-        String absolute= Paths.get("person-images").toFile().getAbsolutePath()+ File.separator+nombreFoto;
-        person.setPersonalPhoto(absolute);
-        }
-
+            person.setPersonalPhoto(createFile(file));
             Person personsave = personService.savePerson(person);
-            if(personsave!=null)
-            {
-                List<Address> addressList = new ArrayList<Address>();
-                for (String text : addresses) {
-                    Address ad= new Address();
-                    ad.setText(text.trim());
-                    ad.setPerson(personsave);
-                    Address addressSave = addressRepository.save(ad);
-                    addressList.add(addressSave);
-                }
-                personsave.setAddresses(addressList);
 
-                List<Phone> phoneList = new ArrayList<Phone>();
-                for (String text : phoneNumber) {
-                    Phone ph= new Phone();
-                    ph.setText(text);
-                    ph.setPerson(personsave);
-                    Phone phoneSave = phoneRepository.save(ph);
-                    phoneList.add(phoneSave);
-                }
-                personsave.setPhoneNumbers(phoneList);
-            }
+                personsave.setAddresses(createAndSaveAddresses(addresses,person));
+
+                personsave.setPhoneNumbers(createAndSavePhone(phoneNumber, person));
                 
-            return ResponseEntity.status(HttpStatus.OK).body(personsave);
+            return ResponseEntity.status(HttpStatus.OK).body(person);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -395,6 +348,58 @@ public class PersonController {
     private boolean isValidPhoneNumber(String phone) {
         return phone.matches("^\\+[0-9 ]+$");
     }
+    private boolean isDateOfBirthValid(Date dateOfBirth) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String dateOfBirthStr = dateFormat.format(dateOfBirth);
+        int year = Integer.parseInt(dateOfBirthStr.substring(0, 4));
+        return year >= 1900;
+    }
+    private boolean arePhoneNumbersValid(String[] phoneNumbers) {
+        for (String phoneNumber : phoneNumbers) {
+            if (!isValidPhoneNumber(phoneNumber)||personService.findPhoneExist(phoneNumber)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    private String createFile( MultipartFile file) throws IOException {
+        //Person person = new Person();
+
+        if (file != null) {
+            int index = file.getOriginalFilename().indexOf(".");
+            String extension = "." + file.getOriginalFilename().substring(index + 1);
+            String nombreFoto = Calendar.getInstance().getTimeInMillis() + extension;
+            FileUploadUtil.saveFile("person-images", nombreFoto, file);
+            String absolute = Paths.get("person-images").toFile().getAbsolutePath() + File.separator + nombreFoto;
+            return absolute ;
+        }
+
+        return null;
+    }
+    private List<Address> createAndSaveAddresses(String[] addresses, Person personsave) {
+        List<Address> addressList = new ArrayList<>();
+        for (String text : addresses) {
+            Address ad = new Address();
+            ad.setText(text.trim());
+            ad.setPerson(personsave);
+            Address addressSave = addressRepository.save(ad);
+            addressList.add(addressSave);
+        }
+        return addressList;
+    }
+    private List<Phone> createAndSavePhone(String[] phones, Person personsave) {
+        List<Phone> phoneList = new ArrayList<>();
+        for (String text : phones) {
+            Phone ph = new Phone();
+            ph.setText(text.trim());
+            ph.setPerson(personsave);
+            Phone phoneSave = phoneRepository.save(ph);
+            phoneList.add(phoneSave);
+        }
+        return phoneList;
+    }
+
+
 
     private String validPersonRequest(Person person){
         String response="";

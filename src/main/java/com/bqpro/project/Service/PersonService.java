@@ -10,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class PersonService {
@@ -72,8 +70,14 @@ public class PersonService {
         return find;
     }
 
-    public boolean reviewString(String[] array){
-        for (int i = 0; i < array.length; i++)
+    public boolean reviewString(String[] values){
+        Set<String> uniqueValues = new HashSet<>();
+        for (String value : values) {
+            String trimmedValue = value.trim();
+            uniqueValues.add(trimmedValue);
+        }
+        return uniqueValues.size() != values.length;
+        /*for (int i = 0; i < array.length; i++)
         {
             for (int j = i + 1; j < array.length; j++)
             {
@@ -81,8 +85,8 @@ public class PersonService {
                     return true;
                 }
             }
-        }
-        return false;
+        }*/
+       // return false;
     }
 
     public boolean findPhoneExist(String phone){
