@@ -78,7 +78,7 @@ public class PersonController {
     //@PreAuthorize("hasRole('ADMIN')")
     @RequestMapping(value="/create", method=RequestMethod.POST,consumes={MediaType.MULTIPART_FORM_DATA_VALUE},
             produces=MediaType.APPLICATION_JSON_VALUE)
-    private ResponseEntity<?> create(@RequestParam(value = "image", required = false) MultipartFile file,
+    public ResponseEntity<?> create(@RequestParam(value = "image", required = false) MultipartFile file,
                                           @RequestParam("firstName") String firstName,
                                           @RequestParam("secondName") String secondName,
                                           @RequestParam("dateOfBirth") Date dateOfBirth,
