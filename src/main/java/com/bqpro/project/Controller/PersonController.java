@@ -402,7 +402,7 @@ public class PersonController {
             boolean find = false;
             while(it.hasNext()) {
                 Address address = it.next();
-                if(add.getId()==address.getId())
+                if(add.getId().equals(address.getId()))
                 {
                     find = true;
                     address.setText(add.getText());
@@ -428,7 +428,7 @@ public class PersonController {
             boolean find = false;
             while(it.hasNext()) {
                 Phone phone = it.next();
-                if(ph.getId()==phone.getId())
+                if(ph.getId().equals(phone.getId()))
                 {
                     find = true;
                     phone.setText(ph.getText());
