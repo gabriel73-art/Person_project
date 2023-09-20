@@ -39,7 +39,7 @@ import com.bqpro.project.Utils.FileUploadUtil;
 @RequestMapping("/persons")
 public class PersonController {
     private final PersonService personService;
-    private final String ADDRESS_REPEAT="Error: Address repeat !";
+    private static final String ADDRESS_REPEAT="Error: Address repeat !";
     @Autowired
     PersonRepository personRepository;
 
